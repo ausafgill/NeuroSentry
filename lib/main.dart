@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mental_healthapp/features/auth/screens/create_profile.dart';
 import 'package:mental_healthapp/features/auth/screens/splash_screen.dart';
+import 'package:mental_healthapp/features/check%20in/intro.dart';
 import 'package:mental_healthapp/theme/theme.dart';
 import 'package:mental_healthapp/views/home.dart';
 import 'package:mental_healthapp/views/navScreen.dart';
@@ -18,6 +19,6 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
         theme: EAppTheme.lightTheme,
         debugShowCheckedModeBanner: false,
-        home: SplashScreen());
+        home: CheckInIntro());
   }
 }

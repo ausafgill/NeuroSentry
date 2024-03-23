@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mental_healthapp/features/auth/get_started.dart';
+import 'package:mental_healthapp/features/auth/screens/get_started.dart';
 import 'package:mental_healthapp/shared/constants/colors.dart';
 import 'package:mental_healthapp/shared/constants/utils/helper_button.dart';
 
