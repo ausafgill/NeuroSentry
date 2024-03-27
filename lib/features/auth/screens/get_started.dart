@@ -16,7 +16,7 @@ class _GetStartedState extends State<GetStarted> {
     return Scaffold(
       body: Column(
         children: [
-          Spacer(),
+          const Spacer(),
           Center(
             child: Container(
               height: MediaQuery.of(context).size.height * 0.3,
@@ -50,11 +50,16 @@ class _GetStartedState extends State<GetStarted> {
           ),
           const Spacer(),
           HelperButton(
-              name: 'Get Started',
-              onTap: () {
-                Navigator.pushReplacement(context,
-                    MaterialPageRoute(builder: (context) => LoginScreen()));
-              })
+            name: 'Get Started',
+            onTap: () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const LoginScreen(),
+                ),
+              );
+            },
+          )
         ],
       ),
     );

@@ -1,31 +1,32 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mental_healthapp/features/auth/controller/auth_controller.dart';
+import 'package:mental_healthapp/features/dashboard/screens/nav_screen.dart';
+import 'package:mental_healthapp/models/profile_model.dart';
 import 'package:mental_healthapp/shared/constants/colors.dart';
 import 'package:mental_healthapp/shared/constants/utils/helper_button.dart';
 import 'package:mental_healthapp/shared/constants/utils/helper_textfield.dart';
 
-class CreateProfile extends StatefulWidget {
+class CreateProfile extends ConsumerStatefulWidget {
+  static const routeName = '/create-profile';
   const CreateProfile({super.key});
 
   @override
-  State<CreateProfile> createState() => _CreateProfileState();
+  ConsumerState<CreateProfile> createState() => _CreateProfileState();
 }
 
-class _CreateProfileState extends State<CreateProfile> {
+class _CreateProfileState extends ConsumerState<CreateProfile> {
   final TextEditingController _username = TextEditingController();
   final TextEditingController _dateController = TextEditingController();
-  final TextEditingController _phoneNum = TextEditingController();
-  final TextEditingController _age = TextEditingController();
   bool isGenderSelected = false;
   String? genderValue;
 
   @override
   void dispose() {
-    // TODO: implement dispose
     super.dispose();
     _username.dispose();
     _dateController.dispose();
-    _phoneNum.dispose();
-    _age.dispose();
   }
 
   DateTime selectedDate = DateTime.now();
@@ -41,7 +42,7 @@ class _CreateProfileState extends State<CreateProfile> {
     if (picked != null && picked != selectedDate) {
       setState(() {
         selectedDate = picked;
-        _dateController.text = "${picked.day}/${picked.month}/${picked.year}";
+        _dateController.text = '${picked.day}/${picked.month}/${picked.year}';
       });
     }
   }
@@ -55,9 +56,33 @@ class _CreateProfileState extends State<CreateProfile> {
     }
   }
 
+  Future saveProfile() async {
+    if (isGenderSelected == true &&
+        _username.text.isNotEmpty &&
+        _dateController.text.isNotEmpty) {
+      final profile = UserProfile(
+        profileId: FirebaseAuth.instance.currentUser!.uid,
+        profileName: _username.text,
+        profileDoB: selectedDate,
+        profileGender: genderValue!,
+      );
+      await ref.read(authControllerProvider).saveUserProfile(profile);
+
+      if (mounted) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const NavScreen(),
+          ),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
       ),
@@ -74,15 +99,11 @@ class _CreateProfileState extends State<CreateProfile> {
               height: 20,
             ),
             HelperTextField(
-                htxt: 'Enter name',
-                iconData: Icons.person,
-                controller: _username,
-                keyboardType: TextInputType.name),
-            HelperTextField(
-                htxt: 'Enter DOB',
-                iconData: Icons.person,
-                controller: _username,
-                keyboardType: TextInputType.name),
+              htxt: 'Enter name',
+              iconData: Icons.person,
+              controller: _username,
+              keyboardType: TextInputType.name,
+            ),
             Padding(
               padding: const EdgeInsets.all(15.0),
               child: TextFormField(
@@ -144,18 +165,11 @@ class _CreateProfileState extends State<CreateProfile> {
                 ),
               ),
             ),
-            HelperTextField(
-                htxt: 'Enter Phone Number',
-                iconData: Icons.call,
-                controller: _phoneNum,
-                keyboardType: TextInputType.number),
-            HelperTextField(
-                htxt: "Enter Age",
-                iconData: Icons.numbers,
-                controller: _age,
-                keyboardType: TextInputType.number),
-            Spacer(),
-            HelperButton(name: 'Create Profile', onTap: () {})
+            const Spacer(),
+            HelperButton(
+              name: 'Create Profile',
+              onTap: () => saveProfile(),
+            )
           ],
         ),
       ),

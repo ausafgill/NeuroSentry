@@ -1,21 +1,32 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mental_healthapp/features/auth/controller/auth_controller.dart';
 import 'package:mental_healthapp/shared/constants/utils/helper_button.dart';
 import 'package:mental_healthapp/shared/constants/utils/helper_textfield.dart';
 
-class ForgotPassword extends StatefulWidget {
+class ForgotPassword extends ConsumerStatefulWidget {
   const ForgotPassword({super.key});
 
   @override
-  State<ForgotPassword> createState() => _ForgotPasswordState();
+  ConsumerState<ForgotPassword> createState() => _ForgotPasswordState();
 }
 
-class _ForgotPasswordState extends State<ForgotPassword> {
-  TextEditingController _emailController = TextEditingController();
+class _ForgotPasswordState extends ConsumerState<ForgotPassword> {
+  final TextEditingController _emailController = TextEditingController();
   @override
   void dispose() {
-    // TODO: implement dispose
     super.dispose();
     _emailController.dispose();
+  }
+
+  Future resetPassword() async {
+    await ref
+        .read(authControllerProvider)
+        .resetPassword(email: _emailController.text);
+
+    if (mounted) {
+      Navigator.pop(context);
+    }
   }
 
   @override
@@ -45,7 +56,10 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                 iconData: Icons.email,
                 controller: _emailController,
                 keyboardType: TextInputType.emailAddress),
-            HelperButton(name: "Reset Password", onTap: () {})
+            HelperButton(
+              name: "Reset Password",
+              onTap: resetPassword,
+            ),
           ],
         ),
       ),

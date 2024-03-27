@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mental_healthapp/features/auth/screens/get_started.dart';
+import 'package:mental_healthapp/features/auth/screens/login_screen.dart';
 import 'package:mental_healthapp/shared/constants/colors.dart';
 import 'package:mental_healthapp/shared/constants/utils/helper_button.dart';
 
@@ -39,14 +40,25 @@ class _AuthScreenState extends State<AuthScreen> {
           HelperButton(
             name: "I'm New here",
             onTap: () {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => GetStarted()));
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const GetStarted(),
+                ),
+              );
             },
           ),
           HelperButton(
             name: "I have an account",
             color: const Color.fromARGB(255, 181, 174, 174),
-            onTap: () {},
+            onTap: () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const LoginScreen(),
+                ),
+              );
+            },
           )
         ],
       ),
