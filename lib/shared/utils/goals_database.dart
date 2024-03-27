@@ -41,6 +41,10 @@ class GoalDataBase extends ChangeNotifier {
     _myBox.put('GOALLIST', updatedGoals);
     notifyListeners();
   }
+
+  Future<void> clearHiveData() async {
+    Hive.box('mybox').clear();
+  }
 }
 
 class Appointment {

@@ -6,6 +6,8 @@ import 'package:mental_healthapp/features/auth/controller/profile_controller.dar
 import 'package:mental_healthapp/features/auth/screens/login_screen.dart';
 import 'package:mental_healthapp/features/profile/screens/booking_view.dart';
 import 'package:mental_healthapp/shared/constants/colors.dart';
+import 'package:mental_healthapp/shared/utils/goals_database.dart';
+import 'package:provider/provider.dart' as provider;
 
 class ProfileView extends ConsumerStatefulWidget {
   const ProfileView({super.key});
@@ -17,6 +19,8 @@ class ProfileView extends ConsumerStatefulWidget {
 class _ProfileViewState extends ConsumerState<ProfileView> {
   Future logout() async {
     ref.read(authControllerProvider).signOutUser();
+    final db = provider.Provider.of<GoalDataBase>(context, listen: false);
+    db.clearHiveData();
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
