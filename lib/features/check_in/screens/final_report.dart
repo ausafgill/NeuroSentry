@@ -150,7 +150,6 @@ class _FinalCheckInReportState extends ConsumerState<FinalCheckInReport> {
                         ],
                       ),
                     ),
-                    HelperButton(name: 'Journal', onTap: () {}),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [

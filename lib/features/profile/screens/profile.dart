@@ -1,14 +1,19 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:mental_healthapp/features/auth/controller/auth_controller.dart';
 import 'package:mental_healthapp/features/auth/controller/profile_controller.dart';
+import 'package:mental_healthapp/features/auth/repository/profile_repository.dart';
 import 'package:mental_healthapp/features/auth/screens/login_screen.dart';
+import 'package:mental_healthapp/features/profile/screens/book_marks_screen.dart';
 import 'package:mental_healthapp/features/profile/screens/booking_view.dart';
 import 'package:mental_healthapp/shared/constants/colors.dart';
-import 'package:mental_healthapp/shared/utils/goals_database.dart';
+import 'package:mental_healthapp/shared/utils/pick_image.dart';
 
 class ProfileView extends ConsumerStatefulWidget {
   const ProfileView({super.key});
@@ -29,8 +34,17 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
     );
   }
 
+  Future pickImage() async {
+    File? file = await pickImageFromGallery(context);
+    if (file != null) {
+      await ref.read(profileControllerProvider).uploadPicture(file);
+      setState(() {});
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
     return Scaffold(
       appBar: AppBar(
         backgroundColor: EColors.primaryColor,
@@ -45,14 +59,42 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
           const SizedBox(
             height: 10,
           ),
-          Container(
-            height: 180,
-            decoration: const BoxDecoration(
-              shape: BoxShape.circle,
-              image: DecorationImage(
-                image: AssetImage('assets/images/man.png'),
+          Stack(
+            children: [
+              Container(
+                height: 180,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  image: DecorationImage(
+                    image: ref
+                                .read(profileRepositoryProvider)
+                                .profile!
+                                .profilePic ==
+                            null
+                        ? const AssetImage('assets/images/man.png')
+                        : NetworkImage(ref
+                            .read(profileRepositoryProvider)
+                            .profile!
+                            .profilePic!) as ImageProvider,
+                  ),
+                ),
               ),
-            ),
+              Positioned(
+                top: 140,
+                left: size.width * 0.6,
+                child: GestureDetector(
+                  onTap: pickImage,
+                  child: Container(
+                    height: 50,
+                    decoration: const BoxDecoration(
+                      color: Colors.cyan,
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(Icons.add),
+                  ),
+                ),
+              ),
+            ],
           ),
           const SizedBox(
             height: 10,
@@ -65,11 +107,11 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               Text(
-                'Follwers: 12',
+                'Following: ${ref.read(profileRepositoryProvider).profile!.followingCount}',
                 style: Theme.of(context).textTheme.headlineSmall,
               ),
               Text(
-                'Follwing: 12',
+                'Followers: ${ref.read(profileRepositoryProvider).profile!.followerCount}',
                 style: Theme.of(context).textTheme.headlineSmall,
               ),
             ],
@@ -88,9 +130,10 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
             },
           ),
           ProfileTile(
-            name: 'Reminders',
+            name: 'Book Marks',
             iconData: FontAwesomeIcons.clock,
-            ontap: () {},
+            ontap: () =>
+                Navigator.pushNamed(context, BookMarksScreen.routeName),
           ),
           ProfileTile(
             name: 'Settings',

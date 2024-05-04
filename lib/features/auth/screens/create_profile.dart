@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mental_healthapp/features/auth/controller/auth_controller.dart';
+import 'package:mental_healthapp/features/chat/controller/chat_controller.dart';
 import 'package:mental_healthapp/features/dashboard/screens/nav_screen.dart';
 import 'package:mental_healthapp/models/profile_model.dart';
 import 'package:mental_healthapp/shared/constants/colors.dart';
@@ -65,8 +66,13 @@ class _CreateProfileState extends ConsumerState<CreateProfile> {
         profileName: _username.text,
         profileDoB: selectedDate,
         profileGender: genderValue!,
+        bookMarkPosts: [],
+        followingUids: [],
       );
       await ref.read(authControllerProvider).saveUserProfile(profile);
+      await ref
+          .read(chatControllerProvider)
+          .createOrGetOneToOneChatRoom("help", true);
 
       if (mounted) {
         Navigator.pushReplacement(

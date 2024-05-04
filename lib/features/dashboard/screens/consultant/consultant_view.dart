@@ -1,15 +1,12 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:mental_healthapp/features/chat/controller/chat_controller.dart';
-import 'package:mental_healthapp/features/chat/screens/chat_screen.dart';
+import 'package:mental_healthapp/features/chat/screens/chat_consultant_screen.dart';
 import 'package:mental_healthapp/features/dashboard/screens/consultant/book_appointments.dart';
 import 'package:mental_healthapp/shared/constants/colors.dart';
 import 'package:mental_healthapp/shared/constants/utils/helper_button.dart';
 import 'package:mental_healthapp/shared/constants/utils/helper_textfield.dart';
-import 'package:mental_healthapp/shared/utils/show_snackbar.dart';
 
 class ConsultantView extends ConsumerStatefulWidget {
   final String name;
@@ -89,13 +86,13 @@ class _ConsultantViewState extends ConsumerState<ConsultantView> {
                           onPressed: () async {
                             final chatModel = await ref
                                 .read(chatControllerProvider)
-                                .createOrGetChatRoom(widget.name);
+                                .createOrGetOneToOneChatRoom(widget.name, true);
                             if (context.mounted) {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) =>
-                                      ChatScreen(chatRoom: chatModel),
+                                      ChatConsultantScreen(chatRoom: chatModel),
                                 ),
                               );
                             }

@@ -55,36 +55,6 @@ class _ArticlesViewScreenState extends ConsumerState<ArticlesViewScreen> {
           },
         ),
       ),
-      floatingActionButton: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: GestureDetector(
-          onTap: () {},
-          child: Container(
-            height: 50,
-            width: 200,
-            decoration: BoxDecoration(
-              color: EColors.primaryColor,
-              borderRadius: BorderRadius.circular(15),
-            ),
-            child: const Center(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  Text(
-                    "Show Bookmarks",
-                    style: TextStyle(color: EColors.white, fontSize: 16),
-                  ),
-                  Icon(
-                    Icons.bookmark,
-                    color: EColors.white,
-                  )
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
   }
 }

@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mental_healthapp/models/profile_model.dart';
 
@@ -7,7 +10,12 @@ final profileRepositoryProvider = Provider((ref) => ProfileRepository());
 
 class ProfileRepository {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
   UserProfile? profile;
+
+  void updateProfile(UserProfile profileData) {
+    profile = profileData;
+  }
 
   Future<void> saveProfile(UserProfile profile) async {
     try {
@@ -40,6 +48,21 @@ class ProfileRepository {
       }
       profile = userProfile;
     }
+  }
+
+  Future uploadPictureToFirebase(File file) async {
+    Reference storageReference = FirebaseStorage.instance
+        .ref()
+        .child('images/${_auth.currentUser!.uid}');
+
+    UploadTask uploadTask = storageReference.putFile(file);
+    TaskSnapshot taskSnapshot = await uploadTask;
+    String url = await taskSnapshot.ref.getDownloadURL();
+    profile!.profilePic = url;
+    await _firestore
+        .collection('users')
+        .doc(_auth.currentUser!.uid)
+        .update(profile!.toMap());
   }
 
   Future<void> updateUserScores() async {

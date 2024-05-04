@@ -110,13 +110,17 @@ class _GoalHomeScreenState extends State<GoalHomeScreen> {
                       itemCount: db.goals.length,
                       itemBuilder: (context, index) {
                         return GoalTile(
-                          title: db.goals[index][0],
-                          onCompleted: db.goals[index][1],
+                          title: db.goals[index]['goal'],
+                          onCompleted: db.goals[index]['bool'],
                           deleteTask: (context) {
-                            db.deleteTask(index); // Call deleteTask method
+                            db.deleteTask(
+                              db.goals[index]['goal'],
+                            ); // Call deleteTask method
                           },
                           onChanged: (value) {
-                            db.checkBox(index, value); // Call checkBox method
+                            db.checkBox(
+                              db.goals[index]['goal'],
+                            ); // Call checkBox method
                           },
                         );
                       },

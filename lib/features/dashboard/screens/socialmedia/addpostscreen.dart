@@ -1,25 +1,71 @@
-import 'dart:developer';
+import 'dart:io';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mental_healthapp/features/auth/repository/profile_repository.dart';
+import 'package:mental_healthapp/features/dashboard/repository/social_media_repository.dart';
+import 'package:mental_healthapp/models/post_model.dart';
 import 'package:mental_healthapp/shared/constants/colors.dart';
+import 'package:mental_healthapp/shared/loading.dart';
+import 'package:mental_healthapp/shared/utils/pick_image.dart';
+import 'package:uuid/uuid.dart';
 
-import 'package:provider/provider.dart';
-
-class AddPostScreen extends StatefulWidget {
+class AddPostScreen extends ConsumerStatefulWidget {
   static const routeName = '/add-post';
   const AddPostScreen({super.key});
 
   @override
-  State<AddPostScreen> createState() => _AddPostScreenState();
+  ConsumerState<AddPostScreen> createState() => _AddPostScreenState();
 }
 
-class _AddPostScreenState extends State<AddPostScreen> {
+class _AddPostScreenState extends ConsumerState<AddPostScreen> {
   TextEditingController desController = TextEditingController();
   bool isLoading = false;
+  File? file;
+
+  Future pickImage() async {
+    file = await pickImageFromGallery(context);
+    if (file != null) {
+      setState(() {});
+    }
+  }
+
+  Future addPost() async {
+    setState(() {
+      isLoading = true;
+    });
+    String postUid = const Uuid().v4();
+    String? imageUrl;
+    if (file != null) {
+      imageUrl = await ref
+          .read(socialMediaRepositoryProvider)
+          .uploadPostPicture(file!, postUid);
+    }
+    PostModel post = PostModel(
+      postUid: postUid,
+      profileUid: FirebaseAuth.instance.currentUser!.uid,
+      userName: ref.read(profileRepositoryProvider).profile!.profileName,
+      description: desController.text,
+      postTime: DateTime.now(),
+      likes: 0,
+      commentCount: 0,
+      likesProfileUid: [],
+      profilePic: ref.read(profileRepositoryProvider).profile!.profilePic,
+      imageUrl: imageUrl,
+      isGroupShare: false,
+    );
+    desController.clear();
+
+    await ref.read(socialMediaRepositoryProvider).addPost(post);
+
+    setState(() {
+      isLoading = false;
+    });
+    if (mounted) {
+      Navigator.pop(context);
+    }
+  }
 
   // void postImgg(
   //   String username,
@@ -91,59 +137,107 @@ class _AddPostScreenState extends State<AddPostScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: EColors.primaryColor,
-        actions: [
-          TextButton(
-              onPressed: () {},
-              child: Text(
-                "POST",
-                style: TextStyle(color: EColors.white),
-              ))
-        ],
-      ),
-      body: Column(
-        children: [
-          isLoading
-              ? LinearProgressIndicator(
-                  color: Colors.blue,
+    final size = MediaQuery.of(context).size;
+    return isLoading
+        ? const LoadingScreen()
+        : Scaffold(
+            resizeToAvoidBottomInset: false,
+            appBar: AppBar(
+              backgroundColor: EColors.primaryColor,
+              actions: [
+                TextButton(
+                  onPressed: addPost,
+                  child: const Text(
+                    "POST",
+                    style: TextStyle(color: EColors.white),
+                  ),
                 )
-              : Container(),
-          Padding(
-            padding: const EdgeInsets.all(10.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              crossAxisAlignment: CrossAxisAlignment.start,
+              ],
+            ),
+            body: Column(
               children: [
                 Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child: CircleAvatar(
-                    backgroundImage: NetworkImage(''
-                        'https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'),
-                  ),
-                ),
-                Expanded(
-                  child: TextField(
-                    controller: desController,
-                    decoration: InputDecoration(
-                        hintText: 'Write about post', border: InputBorder.none),
-                    maxLines: 8,
-                  ),
-                ),
-                SizedBox(
-                    height: 45,
-                    width: 45,
-                    child: Container(
-                        decoration: BoxDecoration(
+                  child: Container(
+                    height: size.width * 0.8,
+                    width: size.width * 0.8,
+                    decoration: file == null
+                        ? BoxDecoration(
+                            color: Colors.grey[400],
+                            borderRadius: const BorderRadius.all(
+                              Radius.circular(10.0),
+                            ),
+                          )
+                        : BoxDecoration(
+                            borderRadius: const BorderRadius.all(
+                              Radius.circular(10.0),
+                            ),
                             image: DecorationImage(
-                                image: NetworkImage(
-                                    'https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')))))
+                              image: FileImage(file!),
+                            ),
+                          ),
+                    child: file == null
+                        ? const Center(
+                            child: Text(
+                              'No Image Selected',
+                              style: TextStyle(color: Colors.white),
+                            ),
+                          )
+                        : const SizedBox.shrink(),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(10.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: CircleAvatar(
+                          backgroundImage: ref
+                                      .read(profileRepositoryProvider)
+                                      .profile!
+                                      .profilePic ==
+                                  null
+                              ? const AssetImage('assets/images/man.png')
+                                  as ImageProvider
+                              : NetworkImage(ref
+                                  .read(profileRepositoryProvider)
+                                  .profile!
+                                  .profilePic!),
+                          radius: 20,
+                        ),
+                      ),
+                      Expanded(
+                        child: TextField(
+                          controller: desController,
+                          decoration: const InputDecoration(
+                              hintText: 'Write about post',
+                              border: InputBorder.none),
+                          maxLines: 8,
+                        ),
+                      ),
+                      GestureDetector(
+                        onTap: pickImage,
+                        child: Container(
+                          width: 50,
+                          height: 50,
+                          decoration: const BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Colors.teal,
+                          ),
+                          child: const Icon(
+                            Icons.add,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                )
               ],
             ),
-          )
-        ],
-      ),
-    );
+          );
   }
 }

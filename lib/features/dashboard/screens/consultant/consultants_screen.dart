@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mental_healthapp/features/auth/controller/profile_controller.dart';
-import 'package:mental_healthapp/features/chat/controller/chat_controller.dart';
-import 'package:mental_healthapp/features/chat/screens/chat_screen.dart';
+import 'package:mental_healthapp/features/chat/screens/message_screen.dart';
 import 'package:mental_healthapp/features/dashboard/controller/dashboard_controller.dart';
 import 'package:mental_healthapp/models/consultant_model.dart';
 import 'package:mental_healthapp/features/dashboard/screens/consultant/consultant_view.dart';
@@ -62,19 +60,13 @@ class _ConsultScreenState extends ConsumerState<ConsultScreen> {
                                 color: EColors.primaryColor,
                                 borderRadius: BorderRadius.circular(20)),
                             child: IconButton(
-                              onPressed: () async {
-                                final chatModel = await ref
-                                    .read(chatControllerProvider)
-                                    .createOrGetChatRoom("help");
-                                if (context.mounted) {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) =>
-                                          ChatScreen(chatRoom: chatModel),
-                                    ),
-                                  );
-                                }
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => const MessageScreen(),
+                                  ),
+                                );
                               },
                               icon: const Icon(
                                 Icons.chat,

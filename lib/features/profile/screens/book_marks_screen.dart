@@ -1,16 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_pagination/firebase_pagination.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:mental_healthapp/features/auth/controller/profile_controller.dart';
 import 'package:mental_healthapp/features/auth/repository/profile_repository.dart';
 import 'package:mental_healthapp/features/chat/controller/chat_controller.dart';
 import 'package:mental_healthapp/features/chat/repository/chat_repository.dart';
-import 'package:mental_healthapp/features/chat/screens/chat_consultant_screen.dart';
 import 'package:mental_healthapp/features/chat/screens/chat_user_screen.dart';
 import 'package:mental_healthapp/features/dashboard/repository/social_media_repository.dart';
 import 'package:mental_healthapp/features/dashboard/screens/socialmedia/add_status.dart';
@@ -21,15 +18,15 @@ import 'package:mental_healthapp/models/post_model.dart';
 import 'package:mental_healthapp/shared/constants/colors.dart';
 import 'package:mental_healthapp/shared/constants/utils/helper_textfield.dart';
 
-class SocialHome extends ConsumerStatefulWidget {
+class BookMarksScreen extends ConsumerStatefulWidget {
   static const routeName = '/social-home';
-  const SocialHome({super.key});
+  const BookMarksScreen({super.key});
 
   @override
-  ConsumerState<SocialHome> createState() => _SocialHomeState();
+  ConsumerState<BookMarksScreen> createState() => _SocialHomeState();
 }
 
-class _SocialHomeState extends ConsumerState<SocialHome> {
+class _SocialHomeState extends ConsumerState<BookMarksScreen> {
   final TextEditingController _postController = TextEditingController();
   @override
   void dispose() {
@@ -40,103 +37,21 @@ class _SocialHomeState extends ConsumerState<SocialHome> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.teal,
+      ),
       body: SafeArea(
         child: Column(
           children: [
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: EColors.softGrey,
-                  borderRadius: BorderRadius.circular(15),
-                ),
-                child: Column(
-                  children: [
-                    Row(
-                      children: [
-                        CircleAvatar(
-                          backgroundImage: ref
-                                      .read(profileRepositoryProvider)
-                                      .profile!
-                                      .profilePic ==
-                                  null
-                              ? const AssetImage('assets/images/man.png')
-                                  as ImageProvider
-                              : NetworkImage(
-                                  ref
-                                      .read(profileRepositoryProvider)
-                                      .profile!
-                                      .profilePic!,
-                                ),
-                          radius: 20,
-                        ),
-                        Expanded(
-                            child: HelperTextField(
-                                htxt: 'Share Your Thoughts',
-                                iconData: FontAwesomeIcons.pen,
-                                controller: _postController,
-                                keyboardType: TextInputType.text))
-                      ],
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        Column(
-                          children: [
-                            IconButton(
-                              onPressed: () {
-                                Navigator.pushNamed(
-                                    context, AddPostScreen.routeName);
-                              },
-                              icon: const Icon(
-                                FontAwesomeIcons.photoFilm,
-                              ),
-                            ),
-                            const Text("MEDIA")
-                          ],
-                        ),
-                        Column(
-                          children: [
-                            IconButton(
-                              onPressed: () {},
-                              icon: const Icon(
-                                FontAwesomeIcons.calendar,
-                              ),
-                            ),
-                            const Text("EVENT")
-                          ],
-                        ),
-                        Column(
-                          children: [
-                            IconButton(
-                              onPressed: () {
-                                Navigator.pushNamed(
-                                  context,
-                                  AddGroupAndShare.routeName,
-                                );
-                              },
-                              icon: const Icon(
-                                FontAwesomeIcons.userGroup,
-                              ),
-                            ),
-                            const Text("GROUPS")
-                          ],
-                        )
-                      ],
-                    )
-                  ],
-                ),
-              ),
-            ),
             Expanded(
               child: FirestorePagination(
                 isLive: true,
-                query: FirebaseFirestore.instance
-                    .collection('posts')
-                    // .where('profileUid',
-                    //     isNotEqualTo: FirebaseAuth.instance.currentUser!.uid),
-                    .orderBy('postTime', descending: true),
+                query: FirebaseFirestore.instance.collection('posts').where(
+                    'postUid',
+                    whereIn: ref
+                        .read(profileRepositoryProvider)
+                        .profile!
+                        .bookMarkPosts),
                 itemBuilder: (context, snapshot, index) {
                   final data = snapshot.data() as Map<String, dynamic>;
 

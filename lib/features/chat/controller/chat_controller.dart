@@ -12,15 +12,27 @@ class ChatController {
   ChatController({required this.chatRepository});
   final ChatRepository chatRepository;
 
-  Future<ChatRoomModel> createOrGetChatRoom(String otherUserName) async {
-    return chatRepository.createOrGetChatRoom(otherUserName);
+  Future<ChatRoomModel> createOrGetOneToOneChatRoom(
+      String otherUserName, bool isConsultant) async {
+    return chatRepository.createOrGetOneToOneChatRoom(
+        otherUserName, isConsultant);
+  }
+
+  Future<ChatRoomModel> createOrGetGroupChatRoom(
+      String chatRoomId, String groupName) async {
+    return chatRepository.createOrGetGroupChatRooms(chatRoomId, groupName);
+  }
+
+  Stream<List<ChatRoomModel>> userChatRooms() {
+    return chatRepository.getUserChatRooms();
   }
 
   Stream<List<MessageModel>> getChatMessages(String chatRoomId) {
     return chatRepository.getChatMessages(chatRoomId);
   }
 
-  Future sendMessage(String chatRoomId, MessageModel message) async {
-    await chatRepository.sendMessage(chatRoomId, message);
+  Future sendMessage(
+      String chatRoomId, MessageModel message, bool isConsultant) async {
+    await chatRepository.sendMessage(chatRoomId, message, isConsultant);
   }
 }

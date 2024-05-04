@@ -33,14 +33,10 @@ class _ArticleViewState extends State<ArticleView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        actions: [
-          IconButton(onPressed: () {}, icon: const Icon(Icons.bookmark_add))
-        ],
         backgroundColor: EColors.primaryColor,
         title: Text(
           "ARTICLE VIEW",
-          style: Theme.of(context).textTheme.headlineSmall,
-        ),
+          style: Theme.of(context).textTheme.headlineSmall,),
         centerTitle: true,
       ),
       body: SingleChildScrollView(

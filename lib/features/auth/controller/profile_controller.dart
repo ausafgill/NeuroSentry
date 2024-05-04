@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mental_healthapp/features/auth/repository/profile_repository.dart';
 import 'package:mental_healthapp/shared/enums/question_type.dart';
@@ -21,6 +23,10 @@ class ProfileController {
 
   double getProfileAverageScore() {
     return profileRepository.profile!.averageScore!;
+  }
+
+  Future uploadPicture(File file) async {
+    await profileRepository.uploadPictureToFirebase(file);
   }
 
   bool isCompletedCheckin() {

@@ -1,9 +1,9 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hive/hive.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:mental_healthapp/features/auth/screens/splash_screen.dart';
+import 'package:mental_healthapp/features/dashboard/screens/socialmedia/comment_screen.dart';
 import 'package:mental_healthapp/firebase_options.dart';
 import 'package:mental_healthapp/router.dart';
 import 'package:mental_healthapp/shared/utils/goals_database.dart';
@@ -16,16 +16,18 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
+  //TODO REMOVE
   await Hive.initFlutter();
   var box = await Hive.openBox('mybox');
+
   runApp(
     ProviderScope(
       child: provider.MultiProvider(
         providers: [
           provider.Provider<Box>.value(value: box),
-          provider.ChangeNotifierProvider(create: (_) => GoalDataBase(box)),
+          provider.ChangeNotifierProvider(create: (_) => GoalDataBase()),
           provider.ChangeNotifierProvider(
-            create: (_) => AppointmentsDB(myBox: box),
+            create: (_) => AppointmentsDB(),
           )
         ],
         child: const MyApp(),

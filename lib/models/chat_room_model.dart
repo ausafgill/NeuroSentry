@@ -4,6 +4,8 @@ class ChatRoomModel {
   final String? lastMessage;
   final String otherMemberName;
   final DateTime timestamp;
+  final bool isGroup;
+  final bool isConsultant;
 
   ChatRoomModel({
     required this.roomId,
@@ -11,5 +13,7 @@ class ChatRoomModel {
     required this.lastMessage,
     required this.otherMemberName,
     required this.timestamp,
+    required this.isGroup,
+    required this.isConsultant,
   });
 }

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mental_healthapp/features/auth/controller/profile_controller.dart';
 import 'package:mental_healthapp/features/chat/controller/chat_controller.dart';
-import 'package:mental_healthapp/features/chat/screens/chat_screen.dart';
+import 'package:mental_healthapp/features/chat/screens/chat_consultant_screen.dart';
+import 'package:mental_healthapp/features/chat/screens/message_screen.dart';
 import 'package:mental_healthapp/features/check_in/screens/final_report.dart';
 import 'package:mental_healthapp/features/check_in/screens/mood_tracker.dart';
 import 'package:mental_healthapp/features/dashboard/controller/dashboard_controller.dart';
@@ -23,6 +23,7 @@ class HomeScreen extends ConsumerStatefulWidget {
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
   QuestionType? worstType;
+
   getWorstScoreType() {
     if (ref.read(profileControllerProvider).isCompletedCheckin()) {
       worstType = ref.read(profileControllerProvider).getWorstScore();
@@ -84,19 +85,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                   color: EColors.primaryColor,
                                   borderRadius: BorderRadius.circular(20)),
                               child: IconButton(
-                                onPressed: () async {
-                                  final chatModel = await ref
-                                      .read(chatControllerProvider)
-                                      .createOrGetChatRoom("help");
-                                  if (context.mounted) {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) =>
-                                            ChatScreen(chatRoom: chatModel),
-                                      ),
-                                    );
-                                  }
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          const MessageScreen(),
+                                    ),
+                                  );
                                 },
                                 icon: const Icon(
                                   Icons.chat,

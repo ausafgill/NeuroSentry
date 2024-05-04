@@ -3,25 +3,25 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mental_healthapp/features/chat/controller/chat_controller.dart';
 import 'package:mental_healthapp/features/dashboard/screens/consultant/book_appointments.dart';
-import 'package:mental_healthapp/features/dashboard/screens/consultant/consultant_view.dart';
 import 'package:mental_healthapp/models/chat_room_model.dart';
 import 'package:mental_healthapp/models/message_model.dart';
 import 'package:mental_healthapp/shared/constants/colors.dart';
 import 'package:mental_healthapp/shared/constants/utils/helper_textfield.dart';
 import 'package:mental_healthapp/shared/loading.dart';
 
-class ChatScreen extends ConsumerStatefulWidget {
+class ChatConsultantScreen extends ConsumerStatefulWidget {
+  static const routeName = '/consultant-screen';
   final ChatRoomModel chatRoom;
-  const ChatScreen({
+  const ChatConsultantScreen({
     super.key,
     required this.chatRoom,
   });
 
   @override
-  ConsumerState<ChatScreen> createState() => _ChatScreenState();
+  ConsumerState<ChatConsultantScreen> createState() => _ChatScreenState();
 }
 
-class _ChatScreenState extends ConsumerState<ChatScreen> {
+class _ChatScreenState extends ConsumerState<ChatConsultantScreen> {
   final TextEditingController _msgController = TextEditingController();
   String? selectedMessage;
 
@@ -43,12 +43,13 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
         final message = MessageModel(
           senderId: FirebaseAuth.instance.currentUser!.uid,
           message: selectedMessage!,
+          isCall: false,
           timestamp: DateTime.now(),
         );
         _msgController.clear();
         await ref
             .read(chatControllerProvider)
-            .sendMessage(widget.chatRoom.roomId, message);
+            .sendMessage(widget.chatRoom.roomId, message, true);
       }
     }
   }

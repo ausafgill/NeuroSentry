@@ -9,6 +9,8 @@ import 'package:mental_healthapp/shared/constants/colors.dart';
 import 'package:mental_healthapp/features/dashboard/screens/consultant/consultants_screen.dart';
 import 'package:mental_healthapp/features/dashboard/screens/home.dart';
 import 'package:mental_healthapp/shared/loading.dart';
+import 'package:mental_healthapp/shared/utils/goals_database.dart';
+import 'package:provider/provider.dart' as provider;
 
 class NavScreen extends ConsumerStatefulWidget {
   const NavScreen({super.key});
@@ -36,6 +38,11 @@ class _NavScreenState extends ConsumerState<NavScreen> {
         .then((value) => setState(() {
               loading = false;
             }));
+
+    final db = provider.Provider.of<GoalDataBase>(context, listen: false);
+    db.getGoalsFromFirebase();
+    final db2 = provider.Provider.of<AppointmentsDB>(context, listen: false);
+    db2.loadAppointmentsFromFirebase();
     super.initState();
   }
 
