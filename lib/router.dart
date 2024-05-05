@@ -6,6 +6,7 @@ import 'package:mental_healthapp/features/chat/screens/chat_user_screen.dart';
 import 'package:mental_healthapp/features/check_in/screens/final_report.dart';
 import 'package:mental_healthapp/features/check_in/screens/mood_tracker.dart';
 import 'package:mental_healthapp/features/check_in/screens/questions.dart';
+import 'package:mental_healthapp/features/dashboard/screens/socialmedia/add_event_screen.dart';
 import 'package:mental_healthapp/features/dashboard/screens/socialmedia/add_status.dart';
 import 'package:mental_healthapp/features/dashboard/screens/socialmedia/addpostscreen.dart';
 import 'package:mental_healthapp/features/dashboard/screens/socialmedia/comment_screen.dart';
@@ -36,6 +37,10 @@ Route<dynamic> generateRoute(RouteSettings settings) {
     case AddPostScreen.routeName:
       return MaterialPageRoute(
         builder: (context) => const AddPostScreen(),
+      );
+    case AddEventScreen.routeName:
+      return MaterialPageRoute(
+        builder: (context) => const AddEventScreen(),
       );
     case BookMarksScreen.routeName:
       return MaterialPageRoute(

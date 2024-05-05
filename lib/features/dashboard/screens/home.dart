@@ -305,13 +305,16 @@ class ExcerciseTile extends StatelessWidget {
       child: GestureDetector(
         onTap: () {
           Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => ArticleView(
-                        articleDes: articleDes,
-                        iconData: iconData,
-                        videoUrl: videoUrl,
-                      )));
+            context,
+            MaterialPageRoute(
+              builder: (context) => ArticleView(
+                articleTitle: title,
+                articleDes: articleDes,
+                iconData: iconData,
+                videoUrl: videoUrl,
+              ),
+            ),
+          );
         },
         child: Container(
           decoration: BoxDecoration(

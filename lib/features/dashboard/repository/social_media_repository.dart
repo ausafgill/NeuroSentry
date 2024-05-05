@@ -6,6 +6,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mental_healthapp/features/auth/repository/profile_repository.dart';
+import 'package:mental_healthapp/models/article_model.dart';
 import 'package:mental_healthapp/models/chat_room_model.dart';
 import 'package:mental_healthapp/models/comment_model.dart';
 import 'package:mental_healthapp/models/post_model.dart';
@@ -159,6 +160,32 @@ class SocialMediaRepository {
 
     await _firestore.collection('users').doc(_auth.currentUser!.uid).update({
       'bookMarkPosts': FieldValue.arrayRemove([post.postUid]),
+    });
+  }
+
+  Future bookMarkArticle(String articleTitle) async {
+    profile!.bookMarkArticles.add(articleTitle);
+    ref
+        .read(profileRepositoryProvider)
+        .profile!
+        .bookMarkPosts
+        .add(articleTitle);
+
+    await _firestore.collection('users').doc(_auth.currentUser!.uid).update({
+      'bookMarkPosts': FieldValue.arrayUnion([articleTitle]),
+    });
+  }
+
+  Future unBookMarkArticles(String articleTitle) async {
+    profile!.bookMarkArticles.remove(articleTitle);
+    ref
+        .read(profileRepositoryProvider)
+        .profile!
+        .bookMarkPosts
+        .remove(articleTitle);
+
+    await _firestore.collection('users').doc(_auth.currentUser!.uid).update({
+      'bookMarkPosts': FieldValue.arrayRemove([articleTitle]),
     });
   }
 

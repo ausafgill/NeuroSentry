@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mental_healthapp/features/auth/repository/profile_repository.dart';
 import 'package:mental_healthapp/features/dashboard/controller/dashboard_controller.dart';
+import 'package:mental_healthapp/features/dashboard/repository/dashboard_repository.dart';
 import 'package:mental_healthapp/features/dashboard/screens/home.dart';
 import 'package:mental_healthapp/models/article_model.dart';
 import 'package:mental_healthapp/shared/constants/colors.dart';
@@ -13,6 +15,7 @@ class ArticlesViewScreen extends ConsumerStatefulWidget {
 }
 
 class _ArticlesViewScreenState extends ConsumerState<ArticlesViewScreen> {
+  bool isBookMark = false;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -28,8 +31,10 @@ class _ArticlesViewScreenState extends ConsumerState<ArticlesViewScreen> {
           ),
         ),
         child: FutureBuilder<List<ArticleModel>>(
-          future:
-              ref.read(dashboardControllerProvider).getArticlesFromFirebase(),
+          future: isBookMark
+              ? ref.read(dashboardRepositoryProvider).fetchBookMarkArticles(
+                  ref.read(profileRepositoryProvider).profile!)
+              : ref.read(dashboardControllerProvider).getArticlesFromFirebase(),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const Center(child: CircularProgressIndicator());
@@ -58,7 +63,10 @@ class _ArticlesViewScreenState extends ConsumerState<ArticlesViewScreen> {
       floatingActionButton: Padding(
         padding: const EdgeInsets.all(8.0),
         child: GestureDetector(
-          onTap: () {},
+          onTap: () {
+            isBookMark = !isBookMark;
+            setState(() {});
+          },
           child: Container(
             height: 50,
             width: 200,

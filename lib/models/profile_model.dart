@@ -14,6 +14,7 @@ class UserProfile {
   double? averageScore;
   List<dynamic> followingUids;
   List<dynamic> bookMarkPosts;
+  List<dynamic> bookMarkArticles;
 
   UserProfile({
     required this.profileId,
@@ -31,6 +32,7 @@ class UserProfile {
     this.averageScore,
     required this.followingUids,
     required this.bookMarkPosts,
+    this.bookMarkArticles = const [],
   });
 
   // Factory method to create a UserProfile object from a map
@@ -55,6 +57,7 @@ class UserProfile {
           : null,
       followingUids: map['followingUids'] ?? [],
       bookMarkPosts: map['bookMarkPosts'] ?? [],
+      bookMarkArticles: map['bookMarkArticles'] ?? [],
     );
   }
 
@@ -76,6 +79,7 @@ class UserProfile {
       'averageScore': averageScore,
       'followingUids': followingUids,
       'bookMarkPosts': bookMarkPosts,
+      'bookMarkArticles': bookMarkArticles,
     };
   }
 }

@@ -31,16 +31,18 @@ void main() async {
             channelDescription:
                 "Receive important alerts and reminders from NeuroSentry"),
         NotificationChannel(
-            channelGroupKey: 'goal_channel_group',
-            channelKey: 'goal_channel',
-            channelName: 'NeuroSentry Alerts',
-            channelDescription:
-                "Receive important alerts and reminders from NeuroSentry")
+          channelGroupKey: 'goal_channel_group',
+          channelKey: 'goal_channel',
+          channelName: 'NeuroSentry Alerts',
+          channelDescription:
+              "Receive important alerts and reminders from NeuroSentry",
+        )
       ],
       channelGroups: [
         NotificationChannelGroup(
-            channelGroupKey: 'basic_channel_group',
-            channelGroupName: 'Basic Group'),
+          channelGroupKey: 'basic_channel_group',
+          channelGroupName: 'Basic Group',
+        ),
       ],
       debug: true);
 

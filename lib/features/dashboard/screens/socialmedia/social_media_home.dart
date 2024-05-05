@@ -1,25 +1,23 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_pagination/firebase_pagination.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:mental_healthapp/features/auth/controller/profile_controller.dart';
 import 'package:mental_healthapp/features/auth/repository/profile_repository.dart';
 import 'package:mental_healthapp/features/chat/controller/chat_controller.dart';
 import 'package:mental_healthapp/features/chat/repository/chat_repository.dart';
-import 'package:mental_healthapp/features/chat/screens/chat_consultant_screen.dart';
 import 'package:mental_healthapp/features/chat/screens/chat_user_screen.dart';
 import 'package:mental_healthapp/features/dashboard/repository/social_media_repository.dart';
+import 'package:mental_healthapp/features/dashboard/screens/socialmedia/add_event_screen.dart';
 import 'package:mental_healthapp/features/dashboard/screens/socialmedia/add_status.dart';
 import 'package:mental_healthapp/features/dashboard/screens/socialmedia/addpostscreen.dart';
 import 'package:mental_healthapp/features/dashboard/screens/socialmedia/comment_screen.dart';
 import 'package:mental_healthapp/models/chat_room_model.dart';
 import 'package:mental_healthapp/models/post_model.dart';
 import 'package:mental_healthapp/shared/constants/colors.dart';
-import 'package:mental_healthapp/shared/constants/utils/helper_textfield.dart';
+import 'package:mental_healthapp/shared/loading.dart';
+import 'package:uuid/uuid.dart';
 
 class SocialHome extends ConsumerStatefulWidget {
   static const routeName = '/social-home';
@@ -31,134 +29,181 @@ class SocialHome extends ConsumerStatefulWidget {
 
 class _SocialHomeState extends ConsumerState<SocialHome> {
   final TextEditingController _postController = TextEditingController();
+  bool isLoading = false;
   @override
   void dispose() {
     super.dispose();
     _postController.dispose();
   }
 
+  Future addPost() async {
+    if (_postController.text != "") {
+      setState(() {
+        isLoading = true;
+      });
+      String postUid = const Uuid().v4();
+      PostModel post = PostModel(
+        postUid: postUid,
+        profileUid: FirebaseAuth.instance.currentUser!.uid,
+        userName: ref.read(profileRepositoryProvider).profile!.profileName,
+        description: _postController.text,
+        postTime: DateTime.now(),
+        likes: 0,
+        commentCount: 0,
+        likesProfileUid: [],
+        profilePic: ref.read(profileRepositoryProvider).profile!.profilePic,
+        isGroupShare: false,
+      );
+      _postController.clear();
+
+      await ref.read(socialMediaRepositoryProvider).addPost(post);
+
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: EColors.softGrey,
-                  borderRadius: BorderRadius.circular(15),
-                ),
-                child: Column(
-                  children: [
-                    Row(
-                      children: [
-                        CircleAvatar(
-                          backgroundImage: ref
-                                      .read(profileRepositoryProvider)
-                                      .profile!
-                                      .profilePic ==
-                                  null
-                              ? const AssetImage('assets/images/man.png')
-                                  as ImageProvider
-                              : NetworkImage(
-                                  ref
-                                      .read(profileRepositoryProvider)
-                                      .profile!
-                                      .profilePic!,
+    return isLoading
+        ? const LoadingScreen()
+        : Scaffold(
+            body: SafeArea(
+              child: Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: EColors.softGrey,
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      child: Column(
+                        children: [
+                          Row(
+                            children: [
+                              CircleAvatar(
+                                backgroundImage: ref
+                                            .read(profileRepositoryProvider)
+                                            .profile!
+                                            .profilePic ==
+                                        null
+                                    ? const AssetImage('assets/images/man.png')
+                                        as ImageProvider
+                                    : NetworkImage(
+                                        ref
+                                            .read(profileRepositoryProvider)
+                                            .profile!
+                                            .profilePic!,
+                                      ),
+                                radius: 20,
+                              ),
+                              Expanded(
+                                child: TextFormField(
+                                  controller: _postController,
+                                  keyboardType: TextInputType.name,
+                                  decoration: const InputDecoration(
+                                    hintText: 'Share Your Thoughts',
+                                    fillColor: EColors.softGrey,
+                                    filled: true,
+                                    prefixIcon: Icon(FontAwesomeIcons.pen),
+                                  ),
                                 ),
-                          radius: 20,
-                        ),
-                        Expanded(
-                          child: TextFormField(
-                            controller: _postController,
-                            keyboardType: TextInputType.name,
-                            decoration: InputDecoration(
-                                hintText: 'Share Your Thoughts',
-                                fillColor: EColors.softGrey,
-                                filled: true,
-                                prefixIcon: Icon(FontAwesomeIcons.pen),
-                                suffixIcon: Icon(Icons.post_add)),
+                              ),
+                              ElevatedButton.icon(
+                                onPressed: () => addPost(),
+                                icon: const Icon(
+                                  Icons.post_add,
+                                  color: EColors.dark,
+                                ),
+                                label: const SizedBox.shrink(),
+                                style: const ButtonStyle(
+                                  backgroundColor: MaterialStatePropertyAll(
+                                    Colors.transparent,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
-                        )
-                      ],
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              Column(
+                                children: [
+                                  IconButton(
+                                    onPressed: () {
+                                      Navigator.pushNamed(
+                                          context, AddPostScreen.routeName);
+                                    },
+                                    icon: const Icon(
+                                      FontAwesomeIcons.photoFilm,
+                                    ),
+                                  ),
+                                  const Text("MEDIA")
+                                ],
+                              ),
+                              Column(
+                                children: [
+                                  IconButton(
+                                    onPressed: () => Navigator.pushNamed(
+                                      context,
+                                      AddEventScreen.routeName,
+                                    ),
+                                    icon: const Icon(
+                                      FontAwesomeIcons.calendar,
+                                    ),
+                                  ),
+                                  const Text("EVENT")
+                                ],
+                              ),
+                              Column(
+                                children: [
+                                  IconButton(
+                                    onPressed: () {
+                                      Navigator.pushNamed(
+                                        context,
+                                        AddGroupAndShare.routeName,
+                                      );
+                                    },
+                                    icon: const Icon(
+                                      FontAwesomeIcons.userGroup,
+                                    ),
+                                  ),
+                                  const Text("GROUPS")
+                                ],
+                              )
+                            ],
+                          )
+                        ],
+                      ),
                     ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        Column(
-                          children: [
-                            IconButton(
-                              onPressed: () {
-                                Navigator.pushNamed(
-                                    context, AddPostScreen.routeName);
-                              },
-                              icon: const Icon(
-                                FontAwesomeIcons.photoFilm,
-                              ),
-                            ),
-                            const Text("MEDIA")
-                          ],
-                        ),
-                        Column(
-                          children: [
-                            IconButton(
-                              onPressed: () {},
-                              icon: const Icon(
-                                FontAwesomeIcons.calendar,
-                              ),
-                            ),
-                            const Text("EVENT")
-                          ],
-                        ),
-                        Column(
-                          children: [
-                            IconButton(
-                              onPressed: () {
-                                Navigator.pushNamed(
-                                  context,
-                                  AddGroupAndShare.routeName,
-                                );
-                              },
-                              icon: const Icon(
-                                FontAwesomeIcons.userGroup,
-                              ),
-                            ),
-                            const Text("GROUPS")
-                          ],
-                        )
-                      ],
-                    )
-                  ],
-                ),
-              ),
-            ),
-            Expanded(
-              child: FirestorePagination(
-                isLive: true,
-                query: FirebaseFirestore.instance
-                    .collection('posts')
-                    // .where('profileUid',
-                    //     isNotEqualTo: FirebaseAuth.instance.currentUser!.uid),
-                    .orderBy('postTime', descending: true),
-                itemBuilder: (context, snapshot, index) {
-                  final data = snapshot.data() as Map<String, dynamic>;
+                  ),
+                  Expanded(
+                    child: FirestorePagination(
+                      isLive: true,
+                      query: FirebaseFirestore.instance
+                          .collection('posts')
+                          // .where('profileUid',
+                          //     isNotEqualTo: FirebaseAuth.instance.currentUser!.uid),
+                          .orderBy('postTime', descending: true),
+                      itemBuilder: (context, snapshot, index) {
+                        final data = snapshot.data() as Map<String, dynamic>;
 
-                  PostModel post = PostModel.fromMap(data);
-                  if (post.imageUrl == null) {
-                    return PostCardWithoutImage(post: post);
-                  } else {
-                    return PostCardWithImage(post: post);
-                  }
-                },
+                        PostModel post = PostModel.fromMap(data);
+                        if (post.imageUrl == null) {
+                          return PostCardWithoutImage(post: post);
+                        } else {
+                          return PostCardWithImage(post: post);
+                        }
+                      },
+                    ),
+                  ),
+                ],
               ),
             ),
-          ],
-        ),
-      ),
-    );
+          );
   }
 }
 

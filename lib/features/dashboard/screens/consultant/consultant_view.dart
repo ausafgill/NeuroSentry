@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:mental_healthapp/features/auth/repository/profile_repository.dart';
 import 'package:mental_healthapp/features/chat/controller/chat_controller.dart';
 import 'package:mental_healthapp/features/chat/screens/chat_consultant_screen.dart';
+import 'package:mental_healthapp/features/dashboard/repository/dashboard_repository.dart';
 import 'package:mental_healthapp/features/dashboard/screens/consultant/book_appointments.dart';
+import 'package:mental_healthapp/models/rating_and_review_model.dart';
 import 'package:mental_healthapp/shared/constants/colors.dart';
 import 'package:mental_healthapp/shared/constants/utils/helper_button.dart';
 import 'package:mental_healthapp/shared/constants/utils/helper_textfield.dart';
@@ -12,11 +15,13 @@ class ConsultantView extends ConsumerStatefulWidget {
   final String name;
   final String type;
   final String description;
+  final List<RatingAndReviewModel> ratings;
   const ConsultantView({
     super.key,
     required this.name,
     required this.type,
     required this.description,
+    required this.ratings,
   });
 
   @override
@@ -24,14 +29,46 @@ class ConsultantView extends ConsumerStatefulWidget {
 }
 
 class _ConsultantViewState extends ConsumerState<ConsultantView> {
-  TextEditingController _reviewController = TextEditingController();
-  TextEditingController _ratingController = TextEditingController();
+  final TextEditingController _reviewController = TextEditingController();
+  final TextEditingController _ratingController = TextEditingController();
   @override
   void dispose() {
     // TODO: implement dispose
     super.dispose();
     _reviewController.dispose();
     _ratingController.dispose();
+  }
+
+  int returnAverageRating() {
+    double averageRating = 0;
+    if (widget.ratings.isEmpty) {
+      return 0;
+    }
+    for (var rating in widget.ratings) {
+      averageRating += rating.rating;
+    }
+    averageRating = averageRating / widget.ratings.length;
+    if (averageRating > 5) {
+      return 5;
+    }
+    return averageRating.ceil();
+  }
+
+  Future addRatingAndReview() async {
+    if (_ratingController.text.isNotEmpty &&
+        _reviewController.text.isNotEmpty) {
+      await ref.read(dashboardRepositoryProvider).updateReviews(
+            RatingAndReviewModel(
+                userName:
+                    ref.read(profileRepositoryProvider).profile!.profileName,
+                rating: int.parse(_ratingController.text),
+                review: _reviewController.text),
+            widget.name,
+          );
+      _reviewController.clear();
+      _ratingController.clear();
+      Navigator.pop(context);
+    }
   }
 
   @override
@@ -54,7 +91,9 @@ class _ConsultantViewState extends ConsumerState<ConsultantView> {
                   children: [
                     Container(
                       decoration: const BoxDecoration(
-                          color: EColors.white, shape: BoxShape.circle),
+                        color: EColors.white,
+                        shape: BoxShape.circle,
+                      ),
                       child: const Padding(
                         padding: EdgeInsets.all(15.0),
                         child: Icon(
@@ -136,9 +175,12 @@ class _ConsultantViewState extends ConsumerState<ConsultantView> {
                           Expanded(
                             child: Row(
                               children: List.generate(
-                                  4,
-                                  (index) => const Icon(Icons.star,
-                                      color: Color.fromRGBO(255, 235, 59, 1))),
+                                returnAverageRating(),
+                                (index) => const Icon(
+                                  Icons.star,
+                                  color: Color.fromRGBO(255, 235, 59, 1),
+                                ),
+                              ),
                             ),
                           ),
                           GestureDetector(
@@ -153,34 +195,38 @@ class _ConsultantViewState extends ConsumerState<ConsultantView> {
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
                                           HelperTextField(
-                                              htxt: 'Give Review',
-                                              iconData: Icons.file_copy,
-                                              controller: _reviewController,
-                                              keyboardType: TextInputType.text),
+                                            htxt: 'Give Review',
+                                            iconData: Icons.file_copy,
+                                            controller: _reviewController,
+                                            keyboardType: TextInputType.text,
+                                          ),
                                           HelperTextField(
-                                              htxt: 'Give Rating',
-                                              iconData: Icons.star_border,
-                                              controller: _reviewController,
-                                              keyboardType: TextInputType.text)
+                                            htxt: 'Give Rating',
+                                            iconData: Icons.star_border,
+                                            controller: _ratingController,
+                                            keyboardType: TextInputType.number,
+                                          ),
                                         ],
                                       ),
                                       actions: [
                                         TextButton(
-                                            onPressed: () {},
-                                            child: const Text(
-                                              "Save",
-                                              style: TextStyle(
-                                                  color: EColors.white),
-                                            )),
+                                          onPressed: () => addRatingAndReview(),
+                                          child: const Text(
+                                            "Save",
+                                            style:
+                                                TextStyle(color: EColors.white),
+                                          ),
+                                        ),
                                         TextButton(
-                                            onPressed: () {
-                                              Navigator.pop(context);
-                                            },
-                                            child: const Text(
-                                              "Cancel",
-                                              style: TextStyle(
-                                                  color: EColors.white),
-                                            ))
+                                          onPressed: () {
+                                            Navigator.pop(context);
+                                          },
+                                          child: const Text(
+                                            "Cancel",
+                                            style:
+                                                TextStyle(color: EColors.white),
+                                          ),
+                                        )
                                       ],
                                     );
                                   });
@@ -203,20 +249,23 @@ class _ConsultantViewState extends ConsumerState<ConsultantView> {
                         ],
                       ),
                       SizedBox(
-                          height: 150,
-                          child: ListView.builder(
-                              itemCount: 5,
-                              itemBuilder: (context, index) {
-                                return const Padding(
-                                  padding: EdgeInsets.all(8.0),
-                                  child: ListTile(
-                                    title: Text('User Name'),
-                                    subtitle: Text(
-                                        'He is a very good and reliable doctor'),
-                                    trailing: Text('3/5'),
-                                  ),
-                                );
-                              }))
+                        height: 150,
+                        child: ListView.builder(
+                          itemCount: widget.ratings.length,
+                          itemBuilder: (context, index) {
+                            return Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: ListTile(
+                                title: Text(widget.ratings[index].userName),
+                                subtitle: Text(widget.ratings[index].review),
+                                trailing: Text(
+                                  '${widget.ratings[index].rating > 5 ? 5 : widget.ratings[index].rating}/5',
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      )
                     ],
                   ),
                 ),

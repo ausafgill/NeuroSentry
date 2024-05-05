@@ -118,10 +118,11 @@ class _BookAppointmentState extends State<BookAppointment> {
                       _selectDate(context);
                     },
                     decoration: const InputDecoration(
-                        hintText: "Select Appointment Date",
-                        fillColor: EColors.white,
-                        filled: true,
-                        prefixIcon: Icon(Icons.calendar_month_outlined)),
+                      hintText: "Select Appointment Date",
+                      fillColor: EColors.white,
+                      filled: true,
+                      prefixIcon: Icon(Icons.calendar_month_outlined),
+                    ),
                   ),
                 ),
                 HelperTextField(

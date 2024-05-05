@@ -1,22 +1,28 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mental_healthapp/features/auth/repository/profile_repository.dart';
+import 'package:mental_healthapp/features/dashboard/repository/social_media_repository.dart';
 import 'package:mental_healthapp/shared/constants/colors.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
-class ArticleView extends StatefulWidget {
+class ArticleView extends ConsumerStatefulWidget {
+  final String articleTitle;
   final String articleDes;
   final String videoUrl;
   final IconData iconData;
-  const ArticleView(
-      {super.key,
-      required this.articleDes,
-      required this.iconData,
-      required this.videoUrl});
+  const ArticleView({
+    super.key,
+    required this.articleTitle,
+    required this.articleDes,
+    required this.iconData,
+    required this.videoUrl,
+  });
 
   @override
-  State<ArticleView> createState() => _ArticleViewState();
+  ConsumerState<ArticleView> createState() => _ArticleViewState();
 }
 
-class _ArticleViewState extends State<ArticleView> {
+class _ArticleViewState extends ConsumerState<ArticleView> {
   late YoutubePlayerController _controller;
 
   @override
@@ -29,12 +35,40 @@ class _ArticleViewState extends State<ArticleView> {
         flags: const YoutubePlayerFlags(autoPlay: false, mute: false));
   }
 
+  Future bookMarkArticle() async {
+    if (ref
+        .read(profileRepositoryProvider)
+        .profile!
+        .bookMarkArticles
+        .contains(widget.articleTitle)) {
+      await ref
+          .read(socialMediaRepositoryProvider)
+          .unBookMarkArticles(widget.articleTitle);
+    } else {
+      await ref
+          .read(socialMediaRepositoryProvider)
+          .bookMarkArticle(widget.articleTitle);
+    }
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         actions: [
-          IconButton(onPressed: () {}, icon: const Icon(Icons.bookmark_add))
+          IconButton(
+            onPressed: () => bookMarkArticle(),
+            icon: Icon(
+              ref
+                      .read(profileRepositoryProvider)
+                      .profile!
+                      .bookMarkArticles
+                      .contains(widget.articleTitle)
+                  ? Icons.bookmark
+                  : Icons.bookmark_outline,
+            ),
+          )
         ],
         backgroundColor: EColors.primaryColor,
         title: Text(

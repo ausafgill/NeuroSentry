@@ -27,83 +27,84 @@ class _ConsultScreenState extends ConsumerState<ConsultScreen> {
         child: Column(
           children: [
             Container(
-                decoration: BoxDecoration(color: EColors.primaryColor),
-                child: Padding(
-                  padding: const EdgeInsets.all(30.0),
-                  child: Column(
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                "Hi ${ref.read(profileControllerProvider).getProfileName()}",
-                                style: GoogleFonts.openSans(
-                                    color: Colors.white,
-                                    fontSize: 25,
-                                    fontWeight: FontWeight.bold),
-                              ),
-                              const SizedBox(
-                                height: 10,
-                              ),
-                              Text(
-                                "${DateTime.now().day} ${DateTime.now().month},${DateTime.now().year}",
-                                style: GoogleFonts.openSans(
-                                    color: Colors.grey[300], fontSize: 15),
-                              ),
-                            ],
-                          ),
-                          Container(
-                            decoration: BoxDecoration(
-                                color: EColors.primaryColor,
-                                borderRadius: BorderRadius.circular(20)),
-                            child: IconButton(
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => const MessageScreen(),
-                                  ),
-                                );
-                              },
-                              icon: const Icon(
-                                Icons.chat,
-                                color: EColors.white,
-                                size: 35,
-                              ),
+              decoration: BoxDecoration(color: EColors.primaryColor),
+              child: Padding(
+                padding: const EdgeInsets.all(30.0),
+                child: Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "Hi ${ref.read(profileControllerProvider).getProfileName()}",
+                              style: GoogleFonts.openSans(
+                                  color: Colors.white,
+                                  fontSize: 25,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                            const SizedBox(
+                              height: 10,
+                            ),
+                            Text(
+                              "${DateTime.now().day} ${DateTime.now().month},${DateTime.now().year}",
+                              style: GoogleFonts.openSans(
+                                  color: Colors.grey[300], fontSize: 15),
+                            ),
+                          ],
+                        ),
+                        Container(
+                          decoration: BoxDecoration(
+                              color: EColors.primaryColor,
+                              borderRadius: BorderRadius.circular(20)),
+                          child: IconButton(
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const MessageScreen(),
+                                ),
+                              );
+                            },
+                            icon: const Icon(
+                              Icons.chat,
+                              color: EColors.white,
+                              size: 35,
                             ),
                           ),
-                        ],
-                      ),
-                      const SizedBox(
-                        height: 30,
-                      ),
-                      TextFormField(
-                        controller: _searchController,
-                        onChanged: (query) => setState(() {}),
-                        decoration: InputDecoration(
-                          contentPadding: const EdgeInsets.all(20),
-                          fillColor: EColors.primaryColor,
-                          filled: true,
-                          prefixIcon: const Icon(
-                            Icons.search,
-                            color: Colors.white,
-                            size: 40,
-                          ),
-                          hintText: 'Search',
-                          hintStyle: const TextStyle(
-                              color: Colors.white, fontSize: 18),
-                          border: OutlineInputBorder(
-                            borderSide: BorderSide.none,
-                            borderRadius: BorderRadius.circular(20),
-                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(
+                      height: 30,
+                    ),
+                    TextFormField(
+                      controller: _searchController,
+                      onChanged: (query) => setState(() {}),
+                      decoration: InputDecoration(
+                        contentPadding: const EdgeInsets.all(20),
+                        fillColor: EColors.primaryColor,
+                        filled: true,
+                        prefixIcon: const Icon(
+                          Icons.search,
+                          color: Colors.white,
+                          size: 40,
+                        ),
+                        hintText: 'Search',
+                        hintStyle:
+                            const TextStyle(color: Colors.white, fontSize: 18),
+                        border: OutlineInputBorder(
+                          borderSide: BorderSide.none,
+                          borderRadius: BorderRadius.circular(20),
                         ),
                       ),
-                    ],
-                  ),
-                )),
+                    ),
+                  ],
+                ),
+              ),
+            ),
             Expanded(
               child: SingleChildScrollView(
                 child: Container(
@@ -141,6 +142,9 @@ class _ConsultScreenState extends ConsumerState<ConsultScreen> {
                                   itemBuilder: (context, index) {
                                     ConsultantModel consultant =
                                         consultants[index];
+                                    print(consultant.name);
+                                    print('THIS IS THE REVIEW LADS HAHA');
+                                    print(consultant.ratingsAndReview);
                                     return GestureDetector(
                                       onTap: () {
                                         Navigator.push(
@@ -148,6 +152,8 @@ class _ConsultScreenState extends ConsumerState<ConsultScreen> {
                                           MaterialPageRoute(
                                             builder: (context) =>
                                                 ConsultantView(
+                                              ratings:
+                                                  consultant.ratingsAndReview,
                                               name: consultant.name,
                                               type: consultant.type,
                                               description:
