@@ -1,16 +1,1 @@
-# mental_healthapp
-
-A new Flutter project.
-
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+Developed a Mental Health Well-being App that allows users to evaluate their mood based on a series of questions. Users can also post content, follow others, and connect with consultants for personalized guidance. This app fosters a supportive community and offers easy access to mental health resources, helping users track their emotional well-being and seek professional help when needed.
